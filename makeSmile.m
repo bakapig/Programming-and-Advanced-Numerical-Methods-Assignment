@@ -24,11 +24,12 @@ function [ curve ] = makeSmile(fwdCurve, T, cps, deltas, vols)
     vols = vols(sort_idx);
 
     % Hint 3: Check arbitrages (using dummy strike K0 = 0)
+    % For K=0, the Black call price limit is C(0) = fwd (see PDF section 1.4)
+    % We must NOT call getBlackCall(fwd, T, 0, 0) because log(0) is undefined
+    C_K0 = fwd;
+    C_Ks = getBlackCall(fwd, T, Ks, vols);
+    C_all = [C_K0; C_Ks(:)];
     K_all = [0; Ks(:)];
-    V_all = [0; vols(:)]; 
-    
-    % Compute Call prices for K=0 and all Ks
-    C_all = getBlackCall(fwd, T, K_all, V_all);
     
     % Arbitrage Check 1: Call prices must be monotonically decreasing
     dC = diff(C_all);

@@ -1,0 +1,20 @@
+C:\Users\Admin\OneDrive - National University of Singapore\Desktop\Repository\FE5116\python\european.py:43: IntegrationWarning: The occurrence of roundoff error is detected, which prevents 
+  the requested tolerance from being achieved.  The error may be 
+  underestimated.
+  val, _ = quad(integrand, lower, upper, limit=200)
+============================================================
+FE5116 Numerical Project — Python Port
+============================================================
+
+domRate = exp(-getRateIntegral(domCurve, 0.8)) = 0.980876
+fwd = getFwdSpot(fwdCurve, 0.8) = 1.485821
+atmfvol = getSmileVol(smile, getFwdSpot(fwdCurve, Ts(end))) = 0.300074
+[vol, f] = getVol(volSurface, 0.8, [fwd, fwd]) = [0.257540, 0.257540], f = 1.485821
+pdf = getPdf(volSurface, 0.8, [fwd, fwd]) = [1.228262, 1.228262]
+European call (ATM) = 0.136241
+European put  (ATM) = 0.136241
+European digital call spread = 0.180906
+
+============================================================
+All computations completed successfully!
+============================================================
