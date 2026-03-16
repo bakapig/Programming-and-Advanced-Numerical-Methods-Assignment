@@ -4,7 +4,28 @@
 % Output :
 % fwdSpot : E[S(t) | S (0)]
 function fwdSpot = getFwdSpot ( curve , T )
-% 1. Get the integral of the domestic rate (r) from 0 to tau, and 0 to T+tau
+    if ~(isstruct(curve) && isfield(curve, 'domCurve') && isfield(curve, 'forCurve') && isfield(curve, 'spot') && isfield(curve, 'tau'))
+        error('getFwdSpot:InvalidCurve. curve must be a struct created by makeFwdCurve.');
+    end
+    if ~(isnumeric(T) && isreal(T) && ~isempty(T))
+        error('getFwdSpot:InvalidMaturity. T must be a non-empty real numeric array.');
+    end
+    if any(~isfinite(T(:))) || any(T(:) < 0)
+        error('getFwdSpot:InvalidMaturity. T must contain only finite non-negative maturities.');
+    end
+
+    if isfield(curve, 'domIntTau')
+        domIntTau = curve.domIntTau;
+    else
+        domIntTau = getRateIntegral(curve.domCurve, curve.tau);
+    end
+    if isfield(curve, 'forIntTau')
+        forIntTau = curve.forIntTau;
+    else
+        forIntTau = getRateIntegral(curve.forCurve, curve.tau);
+    end
+
+    % 1. Get the integral of the domestic rate (r) from 0 to tau, and 0 to T+tau
     domInt_tau = getRateIntegral(curve.domCurve, curve.tau);
     domInt_T_tau = getRateIntegral(curve.domCurve, T + curve.tau);
     

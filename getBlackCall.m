@@ -6,6 +6,25 @@
 % Output :
 % u: vector of call options undiscounted prices
 function u = getBlackCall(f, T, Ks, Vs)
+
+    if ~(isscalar(f) && isnumeric(f) && isreal(f) && isfinite(f) && f >= 0)
+        error('getBlackCall:InvalidForward. f must be a finite non-negative real scalar.');
+    end
+    if ~(isscalar(T) && isnumeric(T) && isreal(T) && isfinite(T) && T >= 0)
+        error('getBlackCall:InvalidMaturity. T must be a finite non-negative real scalar.');
+    end
+    if ~(isnumeric(Ks) && isreal(Ks) && ~isempty(Ks))
+        error('getBlackCall:InvalidStrikes. Ks must be a non-empty real numeric array.');
+    end
+    if ~(isnumeric(Vs) && isreal(Vs) && ~isempty(Vs))
+        error('getBlackCall:InvalidVols. Vs must be a non-empty real numeric array or scalar.');
+    end
+    if any(~isfinite(Ks(:))) || any(Ks(:) < 0)
+        error('getBlackCall:InvalidStrikes. Ks must contain only finite non-negative strikes.');
+    end
+    if any(~isfinite(Vs(:))) || any(Vs(:) < 0)
+        error('getBlackCall:InvalidVols. Vs must contain only finite non-negative volatilities.');
+    end
     
     % Calculate d1 and d2
     d1 = (log(f) - log(Ks)) ./ (Vs .* sqrt(T)) + 0.5 * Vs .* sqrt(T);

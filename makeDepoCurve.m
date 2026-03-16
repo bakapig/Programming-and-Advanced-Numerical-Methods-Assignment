@@ -9,6 +9,22 @@ function curve = makeDepoCurve(ts, dfs)
     ts = ts(:);
     dfs = dfs(:);
 
+    if isempty(ts) || isempty(dfs)
+        error('makeDepoCurve:EmptyInput. ts and dfs must be non-empty vectors.');
+    end
+    if numel(ts) ~= numel(dfs)
+        error('makeDepoCurve:SizeMismatch. ts and dfs must have the same number of elements.');
+    end
+    if any(~isfinite(ts)) || any(ts <= 0)
+        error('makeDepoCurve:InvalidTimes. ts must contain finite strictly positive times.');
+    end
+    if any(diff(ts) <= 0)
+        error('makeDepoCurve:InvalidTimes. ts must be strictly increasing.');
+    end
+    if any(~isfinite(dfs)) || any(dfs <= 0)
+        error('makeDepoCurve:InvalidDiscountFactors. dfs must contain finite strictly positive discount factors.');
+    end
+
     % 2. Add the starting point (Time = 0, Discount Factor = 1)
     t_padded = [0; ts];
     df_padded = [1; dfs];

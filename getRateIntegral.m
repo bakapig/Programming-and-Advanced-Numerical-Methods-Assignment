@@ -5,6 +5,16 @@
 % integ : integral of the local rate function from 0 to t
 function integ = getRateIntegral(curve, t)
 
+    if ~(isstruct(curve) && isfield(curve, 'ts') && isfield(curve, 'cumInt'))
+        error('getRateIntegral:InvalidCurve. curve must be a struct created by makeDepoCurve.');
+    end
+    if ~(isnumeric(t) && isreal(t) && ~isempty(t))
+        error('getRateIntegral:InvalidTime. t must be a non-empty real numeric array.');
+    end
+    if any(~isfinite(t(:))) || any(t(:) < 0)
+        error('getRateIntegral:InvalidTime. t must contain only finite non-negative times.');
+    end
+
     % Input validation
     assert(all(t >= 0), 'Time t must be non-negative.');
     

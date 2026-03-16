@@ -5,6 +5,17 @@
 % vols : implied volatility at strikes Ks
 function vols = getSmileVol(curve, Ks)
 
+    if ~(isstruct(curve) && isfield(curve, 'pp') && isfield(curve, 'aL') && ...
+            isfield(curve, 'bL') && isfield(curve, 'aR') && isfield(curve, 'bR'))
+        error('getSmileVol:InvalidCurve. curve must be a struct created by makeSmile.');
+    end
+    if ~(isnumeric(Ks) && isreal(Ks) && ~isempty(Ks))
+        error('getSmileVol:InvalidStrikes. Ks must be a non-empty real numeric array.');
+    end
+    if any(~isfinite(Ks(:))) || any(Ks(:) < 0)
+        error('getSmileVol:InvalidStrikes. Ks must contain only finite non-negative strikes.');
+    end
+
     % Pre-allocate the output array for maximum speed
     vols = zeros(size(Ks));
     

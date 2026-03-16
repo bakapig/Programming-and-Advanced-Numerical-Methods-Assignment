@@ -7,6 +7,25 @@
 %   fwd: forward spot price for maturity T
 function [vols, fwd] = getVol(volSurf, T, Ks)
 
+    if ~(isstruct(volSurf) && isfield(volSurf, 'Ts') && isfield(volSurf, 'smiles') && ...
+            isfield(volSurf, 'fwds') && isfield(volSurf, 'fwdCurve'))
+        error('getVol:InvalidSurface. volSurf must be a struct created by makeVolSurface.');
+    end
+    if ~(isscalar(T) && isnumeric(T) && isreal(T) && isfinite(T) && T >= 0)
+        error('getVol:InvalidMaturity. T must be a finite non-negative real scalar.');
+    end
+    if ~(isnumeric(Ks) && isreal(Ks) && ~isempty(Ks))
+        error('getVol:InvalidStrikes. Ks must be a non-empty real numeric array.');
+    end
+    if any(~isfinite(Ks(:))) || any(Ks(:) < 0)
+        error('getVol:InvalidStrikes. Ks must contain only finite non-negative strikes.');
+    end
+
+    Ts = volSurf.Ts(:);
+    if T > Ts(end) + 10 * eps(max(1, Ts(end)))
+        error('getVol:ExtrapolationNotAllowed. T exceeds the maximum tenor in the volatility surface.');
+    end
+
     % 1. Get the target forward price
     fwd = getFwdSpot(volSurf.fwdCurve, T);
     

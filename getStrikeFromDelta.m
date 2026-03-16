@@ -8,6 +8,16 @@
 %   K: strike of the option
 function K = getStrikeFromDelta(fwd, T, cp, sigma, delta)
 
+    if ~(isscalar(fwd) && isnumeric(fwd) && isreal(fwd) && isfinite(fwd) && fwd > 0)
+        error('getStrikeFromDelta:InvalidForward. fwd must be a finite strictly positive real scalar.');
+    end
+    if ~(isscalar(T) && isnumeric(T) && isreal(T) && isfinite(T) && T > 0)
+        error('getStrikeFromDelta:InvalidMaturity. T must be a finite strictly positive real scalar.');
+    end
+    if ~(isnumeric(cp) && isreal(cp) && isnumeric(sigma) && isreal(sigma) && isnumeric(delta) && isreal(delta))
+        error('getStrikeFromDelta:InvalidInput. cp, sigma and delta must be real numeric arrays or scalars.');
+    end
+
     % 1. Inverse Normal of the Delta (using erfinv to avoid toolboxes)
     % N_inv(delta) = sqrt(2) * erfinv(2 * delta - 1)
     norm_inv_delta = sqrt(2) .* erfinv(2 .* delta - 1);

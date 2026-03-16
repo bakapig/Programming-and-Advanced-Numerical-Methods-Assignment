@@ -15,6 +15,30 @@ function u = getEuropean(volSurface, T, payoff, ints)
         ints = [0, Inf];
     end
 
+    if ~(isstruct(volSurface) && isfield(volSurface, 'fwdCurve'))
+        error('getEuropean:InvalidSurface. volSurface must be a struct created by makeVolSurface.');
+    end
+    if ~(isscalar(T) && isnumeric(T) && isreal(T) && isfinite(T) && T >= 0)
+        error('getEuropean:InvalidMaturity. T must be a finite non-negative real scalar.');
+    end
+    if ~isa(payoff, 'function_handle')
+        error('getEuropean:InvalidPayoff. payoff must be a function handle.');
+    end
+    if ~(isnumeric(ints) && isreal(ints) && numel(ints) >= 2)
+        error('getEuropean:InvalidIntervals. ints must be a real numeric vector with at least two endpoints.');
+    end
+
+    ints = ints(:).';
+    if any(~isfinite(ints(~isinf(ints)))) || any(ints < 0)
+        error('getEuropean:InvalidIntervals. ints must contain only non-negative finite values, except possibly a final +Inf.');
+    end
+    if any(isinf(ints(1:end-1)))
+        error('getEuropean:InvalidIntervals. Only the last endpoint may be +Inf.');
+    end
+    if any(diff(ints) <= 0)
+        error('getEuropean:InvalidIntervals. ints must be strictly increasing.');
+    end
+
     % 2. Define the mathematical integrand
     % We are integrating: Payoff(x) * Probability(x)
     % 'x' represents the potential future spot prices (S_T)

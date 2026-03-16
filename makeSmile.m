@@ -8,6 +8,26 @@
 % curve : a struct containing data needed in getSmileK
 function [ curve ] = makeSmile(fwdCurve, T, cps, deltas, vols)
 
+    n = numel(vols);
+    if n < 2
+        error('makeSmile:TooFewMarks. At least two smile marks are required.');
+    end
+    if numel(cps) ~= n || numel(deltas) ~= n
+        error('makeSmile:SizeMismatch. cps, deltas and vols must have the same length.');
+    end
+    if ~(isscalar(T) && isnumeric(T) && isreal(T) && isfinite(T) && T > 0)
+        error('makeSmile:InvalidMaturity. T must be a finite strictly positive real scalar.');
+    end
+    if any(~isfinite(cps)) || any(cps ~= 1 & cps ~= -1)
+        error('makeSmile:InvalidOptionType. cps must contain only +1 for calls or -1 for puts.');
+    end
+    if any(~isfinite(deltas)) || any(deltas <= 0 | deltas >= 1)
+        error('makeSmile:InvalidDelta. deltas must contain only values strictly between 0 and 1.');
+    end
+    if any(~isfinite(vols)) || any(vols <= 0)
+        error('makeSmile:InvalidVolatility. vols must contain only finite strictly positive values.');
+    end
+
     % 1. We now calculate the forward spot INSIDE the function!
     fwd = getFwdSpot(fwdCurve, T);
 

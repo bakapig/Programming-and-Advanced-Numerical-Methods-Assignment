@@ -7,6 +7,19 @@
 %   pdf: vector of pdf(Ks)
 function pdf = getPdf(volSurf, T, Ks)
 
+    if ~(isstruct(volSurf) && isfield(volSurf, 'fwdCurve'))
+        error('getPdf:InvalidSurface. volSurf must be a struct created by makeVolSurface.');
+    end
+    if ~(isscalar(T) && isnumeric(T) && isreal(T) && isfinite(T) && T > 0)
+        error('getPdf:InvalidMaturity. T must be a finite strictly positive real scalar.');
+    end
+    if ~(isnumeric(Ks) && isreal(Ks) && ~isempty(Ks))
+        error('getPdf:InvalidStrikes. Ks must be a non-empty real numeric array.');
+    end
+    if any(~isfinite(Ks(:))) || any(Ks(:) < 0)
+        error('getPdf:InvalidStrikes. Ks must contain only finite non-negative strikes.');
+    end
+
     dK = 1e-4;
     
     % THE FIX: Prevent strikes from hitting 0 or going negative!
